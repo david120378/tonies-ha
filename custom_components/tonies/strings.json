@@ -1,0 +1,64 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "mytonies account",
+        "description": "Sign in with your mytonies account (my.tonies.com). All Tonieboxes of your households will be added.",
+        "data": {
+          "username": "E-mail",
+          "password": "Password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate",
+        "description": "The password for {username} is no longer valid.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Invalid e-mail or password",
+      "cannot_connect": "Could not reach the tonies cloud",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "This account is already configured",
+      "reauth_successful": "Re-authentication was successful"
+    }
+  },
+  "entity": {
+    "select": {
+      "max_volume": {
+        "name": "Max volume",
+        "state": { "25": "25 %", "50": "50 %", "75": "75 %", "100": "100 %" }
+      },
+      "max_headphone_volume": {
+        "name": "Max headphone volume",
+        "state": { "25": "25 %", "50": "50 %", "75": "75 %", "100": "100 %" }
+      },
+      "led_level": {
+        "name": "LED",
+        "state": { "off": "Off", "dimmed": "Dimmed", "on": "On" }
+      },
+      "tap_direction": {
+        "name": "Tap direction",
+        "state": { "left": "Next chapter: left", "right": "Next chapter: right" }
+      }
+    },
+    "switch": {
+      "accelerometer": { "name": "Tap & tilt" }
+    },
+    "binary_sensor": {
+      "settings_applied": { "name": "Settings applied" }
+    },
+    "sensor": {
+      "firmware_version": { "name": "Firmware" },
+      "online_state": { "name": "Online state" },
+      "household": { "name": "Household" }
+    },
+    "button": {
+      "refresh": { "name": "Refresh" }
+    }
+  }
+}

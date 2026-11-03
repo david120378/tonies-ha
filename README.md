@@ -1,0 +1,72 @@
+# tonies (Toniebox) für Home Assistant
+
+Inoffizielle Home-Assistant-Integration für die Toniebox-Einstellungen aus der **mytonies-Cloud** (my.tonies.com).
+Kein TeddyCloud, kein Flashen – die Integration spricht dieselbe API wie die Webseite.
+
+> **Hinweis:** Die API ist nicht öffentlich dokumentiert und kann sich jederzeit ändern. Nutzung auf eigene Gefahr; dieses Projekt steht in keiner Verbindung zur tonies GmbH.
+
+## Funktionen
+
+Pro Toniebox im Haushalt wird ein Gerät mit diesen Entitäten angelegt:
+
+| Entität | Typ | Beschreibung |
+|---|---|---|
+| Maximale Lautstärke | select | 25 / 50 / 75 / 100 % |
+| Maximale Kopfhörer-Lautstärke | select | 25 / 50 / 75 / 100 % |
+| LED | select | Aus / Gedimmt / An |
+| Vor- und Zurücksteuern | select | Kapitelrichtung links/rechts |
+| Spulen und Klapsen | switch | Beschleunigungssensor |
+| Einstellungen übernommen | binary_sensor | `on`, sobald die Box die Einstellungen von der Cloud abgeholt hat |
+| Firmware, Online-Status, Haushalt | sensor | Diagnose |
+| Aktualisieren | button | Daten sofort neu laden |
+
+Die Daten werden alle 15 Minuten abgefragt; nach jeder Änderung sofort.
+
+## Wichtig: Die Box muss synchronisieren
+
+Die Toniebox ist ein reiner Cloud-Client. Eine geänderte Einstellung landet sofort in der Cloud,
+**die Box übernimmt sie aber erst beim nächsten Abgleich** – sicher durch Drücken eines Ohrs
+(ca. 3 s, bis ein Ton kommt), ggf. auch beim nächsten Aufwachen aus dem Standby.
+Ob die Box den neuen Stand hat, zeigt `binary_sensor.*_einstellungen_ubernommen`.
+
+## Installation
+
+### HACS
+1. HACS → Integrationen → ⋮ → *Benutzerdefinierte Repositories*
+2. `https://github.com/david120378/tonies-ha` als *Integration* hinzufügen
+3. „tonies (Toniebox)“ installieren, Home Assistant neu starten
+
+### Manuell
+Ordner `custom_components/tonies` nach `/config/custom_components/` kopieren, Neustart.
+
+### Einrichten
+Einstellungen → Geräte & Dienste → Integration hinzufügen → **tonies** → E-Mail und Passwort des mytonies-Kontos.
+
+## Beispiel: Nachtmodus
+
+```yaml
+automation:
+  - alias: "Toniebox: Nachtmodus"
+    triggers:
+      - trigger: time
+        at: "19:00:00"
+        id: nacht
+      - trigger: time
+        at: "07:00:00"
+        id: tag
+    actions:
+      - action: select.select_option
+        target:
+          entity_id: select.haukes_rote_toniebox_maximale_lautstarke
+        data:
+          option: "{{ '25' if trigger.id == 'nacht' else '50' }}"
+```
+
+## Technik
+
+- Auth: Keycloak `login.tonies.com`, Realm `tonies`, Client `my-tonies`, Password-Grant + Refresh-Token
+- API: `https://api.prod.tcs.toys/v2` – `GET /households`, `GET /households/{id}/tonieboxes`, `PATCH /households/{id}/tonieboxes/{boxId}` mit z. B. `{"maxVolume": 25}`
+
+## Lizenz
+
+MIT

@@ -1,0 +1,93 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "mytonies-Konto",
+        "description": "Melde dich mit deinem mytonies-Konto (my.tonies.com) an. Alle Tonieboxen deiner Haushalte werden angelegt.",
+        "data": {
+          "username": "E-Mail",
+          "password": "Passwort"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Erneut anmelden",
+        "description": "Das Passwort für {username} ist nicht mehr gültig.",
+        "data": {
+          "password": "Passwort"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "E-Mail oder Passwort ungültig",
+      "cannot_connect": "tonies-Cloud nicht erreichbar",
+      "unknown": "Unerwarteter Fehler"
+    },
+    "abort": {
+      "already_configured": "Dieses Konto ist bereits eingerichtet",
+      "reauth_successful": "Erneute Anmeldung erfolgreich"
+    }
+  },
+  "entity": {
+    "select": {
+      "max_volume": {
+        "name": "Maximale Lautstärke",
+        "state": {
+          "25": "25 %",
+          "50": "50 %",
+          "75": "75 %",
+          "100": "100 %"
+        }
+      },
+      "max_headphone_volume": {
+        "name": "Maximale Kopfhörer-Lautstärke",
+        "state": {
+          "25": "25 %",
+          "50": "50 %",
+          "75": "75 %",
+          "100": "100 %"
+        }
+      },
+      "led_level": {
+        "name": "LED",
+        "state": {
+          "off": "Aus",
+          "dimmed": "Gedimmt",
+          "on": "An"
+        }
+      },
+      "tap_direction": {
+        "name": "Vor- und Zurücksteuern",
+        "state": {
+          "left": "Kapitel vor: links",
+          "right": "Kapitel vor: rechts"
+        }
+      }
+    },
+    "switch": {
+      "accelerometer": {
+        "name": "Spulen und Klapsen"
+      }
+    },
+    "binary_sensor": {
+      "settings_applied": {
+        "name": "Einstellungen übernommen"
+      }
+    },
+    "sensor": {
+      "firmware_version": {
+        "name": "Firmware"
+      },
+      "online_state": {
+        "name": "Online-Status"
+      },
+      "household": {
+        "name": "Haushalt"
+      }
+    },
+    "button": {
+      "refresh": {
+        "name": "Aktualisieren"
+      }
+    }
+  }
+}
