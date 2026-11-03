@@ -30,16 +30,15 @@ class ToniesBoxEntity(CoordinatorEntity[ToniesCoordinator]):
             serial_number=box_id,
             sw_version=str(box.get("firmwareVersion") or ""),
             connections={("mac", _fmt_mac(box["macAddress"]))} if box.get("macAddress") else set(),
-            suggested_area=None,
         )
 
     @property
     def box(self) -> dict[str, Any]:
-        return self.coordinator.data[self.box_id]
+        return self.coordinator.data.boxes[self.box_id]
 
     @property
     def available(self) -> bool:
-        return super().available and self.box_id in self.coordinator.data
+        return super().available and self.box_id in self.coordinator.data.boxes
 
 
 def _fmt_mac(raw: str) -> str:

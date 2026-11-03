@@ -20,7 +20,16 @@ Pro Toniebox im Haushalt wird ein Gerät mit diesen Entitäten angelegt:
 | Firmware, Online-Status, Haushalt | sensor | Diagnose |
 | Aktualisieren | button | Daten sofort neu laden |
 
-Die Daten werden alle 15 Minuten abgefragt; nach jeder Änderung sofort.
+Zusätzlich pro **Haushalt** ein Gerät mit:
+
+| Entität | Typ | Beschreibung |
+|---|---|---|
+| Tonies | sensor | Anzahl Hörfiguren; Attribut `tonies` mit Titel, Serie, Bild, Sperre |
+| Kreativ-Tonies | sensor | Anzahl Kreativ-Tonies |
+
+und pro **Kreativ-Tonie** ein Gerät mit *Freier Speicher* und *Belegter Speicher* (Minuten, Attribut `live`).
+
+Abfrageintervall: 15 Minuten (in den Integrations-Optionen einstellbar, min. 5); nach jeder Änderung sofort.
 
 ## Wichtig: Die Box muss synchronisieren
 
@@ -65,7 +74,7 @@ automation:
 ## Technik
 
 - Auth: Keycloak `login.tonies.com`, Realm `tonies`, Client `my-tonies`, Password-Grant + Refresh-Token
-- API: `https://api.prod.tcs.toys/v2` – `GET /households`, `GET /households/{id}/tonieboxes`, `PATCH /households/{id}/tonieboxes/{boxId}` mit z. B. `{"maxVolume": 25}`
+- API: `https://api.prod.tcs.toys/v2` – `GET /households`, `GET /households/{id}/tonieboxes`, `PATCH /households/{id}/tonieboxes/{boxId}` mit z. B. `{"maxVolume": 25}`; Tonies per `POST /graphql` (`households { contentTonies … creativeTonies … }`)
 
 ## Lizenz
 

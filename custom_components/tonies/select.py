@@ -57,7 +57,7 @@ async def async_setup_entry(
 ) -> None:
     coordinator = entry.runtime_data
     async_add_entities(
-        ToniesSelect(coordinator, box_id, desc) for box_id in coordinator.data for desc in SELECTS
+        ToniesSelect(coordinator, box_id, desc) for box_id in coordinator.data.boxes for desc in SELECTS
     )
 
 

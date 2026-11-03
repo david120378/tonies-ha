@@ -14,7 +14,7 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ToniesConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback
 ) -> None:
     coordinator = entry.runtime_data
-    async_add_entities(ToniesSettingsAppliedSensor(coordinator, box_id) for box_id in coordinator.data)
+    async_add_entities(ToniesSettingsAppliedSensor(coordinator, box_id) for box_id in coordinator.data.boxes)
 
 
 class ToniesSettingsAppliedSensor(ToniesBoxEntity, BinarySensorEntity):

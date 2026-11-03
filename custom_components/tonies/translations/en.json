@@ -31,34 +31,85 @@
     "select": {
       "max_volume": {
         "name": "Max volume",
-        "state": { "25": "25 %", "50": "50 %", "75": "75 %", "100": "100 %" }
+        "state": {
+          "25": "25 %",
+          "50": "50 %",
+          "75": "75 %",
+          "100": "100 %"
+        }
       },
       "max_headphone_volume": {
         "name": "Max headphone volume",
-        "state": { "25": "25 %", "50": "50 %", "75": "75 %", "100": "100 %" }
+        "state": {
+          "25": "25 %",
+          "50": "50 %",
+          "75": "75 %",
+          "100": "100 %"
+        }
       },
       "led_level": {
         "name": "LED",
-        "state": { "off": "Off", "dimmed": "Dimmed", "on": "On" }
+        "state": {
+          "off": "Off",
+          "dimmed": "Dimmed",
+          "on": "On"
+        }
       },
       "tap_direction": {
         "name": "Tap direction",
-        "state": { "left": "Next chapter: left", "right": "Next chapter: right" }
+        "state": {
+          "left": "Next chapter: left",
+          "right": "Next chapter: right"
+        }
       }
     },
     "switch": {
-      "accelerometer": { "name": "Tap & tilt" }
+      "accelerometer": {
+        "name": "Tap & tilt"
+      }
     },
     "binary_sensor": {
-      "settings_applied": { "name": "Settings applied" }
+      "settings_applied": {
+        "name": "Settings applied"
+      }
     },
     "sensor": {
-      "firmware_version": { "name": "Firmware" },
-      "online_state": { "name": "Online state" },
-      "household": { "name": "Household" }
+      "firmware_version": {
+        "name": "Firmware"
+      },
+      "online_state": {
+        "name": "Online state"
+      },
+      "household": {
+        "name": "Household"
+      },
+      "content_tonies": {
+        "name": "Content tonies"
+      },
+      "creative_tonies": {
+        "name": "Creative tonies"
+      },
+      "remaining": {
+        "name": "Remaining time"
+      },
+      "used": {
+        "name": "Used time"
+      }
     },
     "button": {
-      "refresh": { "name": "Refresh" }
+      "refresh": {
+        "name": "Refresh"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options",
+        "data": {
+          "scan_interval": "Polling interval (minutes)"
+        }
+      }
     }
   }
 }

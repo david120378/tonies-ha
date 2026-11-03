@@ -116,6 +116,24 @@ class ToniesClient:
                 boxes[box["id"]] = box
         return boxes
 
+    async def async_get_tonies(self) -> dict[str, Any]:
+        """Return content tonies and creative tonies per household (GraphQL)."""
+        query = """
+        {
+          households {
+            id
+            name
+            contentTonies { id title lock imageUrl series { name group { name } } tune { item { title } } }
+            creativeTonies { id name live private imageUrl secondsRemaining secondsPresent
+                             tune { item { title } } }
+          }
+        }
+        """
+        result = await self._request("POST", "/graphql", json={"query": query, "variables": {}})
+        if "errors" in result:
+            raise ToniesApiError(f"graphql: {result['errors']}")
+        return result["data"]
+
     async def async_patch_toniebox(self, household_id: str, box_id: str, **fields: Any) -> dict[str, Any]:
         """Change box settings, e.g. maxVolume=25. Returns the updated box."""
         return await self._request("PATCH", f"/households/{household_id}/tonieboxes/{box_id}", json=fields)

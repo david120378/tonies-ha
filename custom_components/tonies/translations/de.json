@@ -82,11 +82,33 @@
       },
       "household": {
         "name": "Haushalt"
+      },
+      "content_tonies": {
+        "name": "Tonies"
+      },
+      "creative_tonies": {
+        "name": "Kreativ-Tonies"
+      },
+      "remaining": {
+        "name": "Freier Speicher"
+      },
+      "used": {
+        "name": "Belegter Speicher"
       }
     },
     "button": {
       "refresh": {
         "name": "Aktualisieren"
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Optionen",
+        "data": {
+          "scan_interval": "Abfrageintervall (Minuten)"
+        }
       }
     }
   }
