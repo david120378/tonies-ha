@@ -9,6 +9,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import ToniesApiError, ToniesAuthError, ToniesClient
 from .coordinator import ToniesConfigEntry, ToniesCoordinator
+from .schedule import ScheduleManager
 
 PLATFORMS: list[Platform] = [
     Platform.BINARY_SENSOR,
@@ -16,6 +17,7 @@ PLATFORMS: list[Platform] = [
     Platform.SELECT,
     Platform.SENSOR,
     Platform.SWITCH,
+    Platform.TIME,
 ]
 
 
@@ -37,8 +39,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ToniesConfigEntry) -> bo
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = coordinator
 
+    coordinator.schedules = ScheduleManager(hass, coordinator, entry.entry_id)
+    await coordinator.schedules.async_load()
+    entry.async_on_unload(coordinator.schedules.async_unload)
+
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
+    # make sure the box is in the right state after a (re)start
+    entry.async_create_background_task(hass, coordinator.schedules.async_apply_all(), "tonies_schedule_apply")
     return True
 
 

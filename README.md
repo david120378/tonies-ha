@@ -61,25 +61,26 @@ Ordner `custom_components/tonies` nach `/config/custom_components/` kopieren, Ne
 ### Einrichten
 Einstellungen → Geräte & Dienste → Integration hinzufügen → **tonies** → E-Mail und Passwort des mytonies-Kontos.
 
-## Beispiel: Nachtmodus
+## Zeitplan (Nachtmodus) – eingebaut
 
-```yaml
-automation:
-  - alias: "Toniebox: Nachtmodus"
-    triggers:
-      - trigger: time
-        at: "19:00:00"
-        id: nacht
-      - trigger: time
-        at: "07:00:00"
-        id: tag
-    actions:
-      - action: select.select_option
-        target:
-          entity_id: select.haukes_rote_toniebox_maximale_lautstarke
-        data:
-          option: "{{ '25' if trigger.id == 'nacht' else '50' }}"
-```
+Pro Box gibt es einen Zeitplan, der ohne eigene Automation funktioniert. Alles wird über Entitäten im UI eingestellt
+(Geräteseite → Konfiguration):
+
+| Entität | Typ | Standard |
+|---|---|---|
+| Zeitplan Lautstärke | switch | aus |
+| Nacht ab | time | 19:00 |
+| Tag ab | time | 07:00 |
+| Lautstärke nachts | select | 25 % |
+| Lautstärke tagsüber | select | 50 % |
+| Zeitplan auch für Kopfhörer | switch | aus |
+
+Ist der Zeitplan an, setzt die Integration zu den beiden Uhrzeiten die maximale Lautstärke in der Cloud. Außerdem wird
+beim Einschalten, bei jeder Änderung und nach einem HA-Neustart sofort der zur aktuellen Uhrzeit passende Wert
+angewendet, falls er abweicht. Die Einstellungen werden in `.storage` gespeichert und überleben Neustarts.
+Zeitfenster über Mitternacht (z. B. 19:00 → 07:00) werden korrekt behandelt.
+
+Wer lieber eine eigene Automation baut, nutzt `select.select_option` auf `select.<box>_maximale_lautstarke`.
 
 ## Icon
 

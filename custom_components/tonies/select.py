@@ -58,9 +58,15 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ToniesConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback
 ) -> None:
     coordinator = entry.runtime_data
-    async_add_entities(
+    entities: list[SelectEntity] = [
         ToniesSelect(coordinator, box_id, desc) for box_id in coordinator.data.boxes for desc in SELECTS
-    )
+    ]
+    entities += [
+        ToniesScheduleVolumeSelect(coordinator, box_id, key, field)
+        for box_id in coordinator.data.boxes
+        for key, field in (("night_volume", "night_volume"), ("day_volume", "day_volume"))
+    ]
+    async_add_entities(entities)
 
 
 class ToniesSelect(ToniesBoxEntity, SelectEntity):
@@ -84,3 +90,29 @@ class ToniesSelect(ToniesBoxEntity, SelectEntity):
     async def async_select_option(self, option: str) -> None:
         value: int | str = int(option) if self.entity_description.numeric else option
         await self.coordinator.async_set_box(self.box_id, **{self.entity_description.api_field: value})
+
+
+class ToniesScheduleVolumeSelect(ToniesBoxEntity, SelectEntity):
+    """Volume used by the schedule at night / during the day."""
+
+    _attr_entity_category = EntityCategory.CONFIG
+    _attr_options = VOLUME_OPTIONS
+
+    def __init__(self, coordinator: ToniesCoordinator, box_id: str, key: str, field: str) -> None:
+        super().__init__(coordinator, box_id, key)
+        self._field = field
+        self._attr_icon = "mdi:volume-low" if field == "night_volume" else "mdi:volume-high"
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        assert self.coordinator.schedules
+        self.async_on_remove(self.coordinator.schedules.async_add_listener(self.async_write_ha_state))
+
+    @property
+    def current_option(self) -> str | None:
+        assert self.coordinator.schedules
+        return str(getattr(self.coordinator.schedules.get(self.box_id), self._field))
+
+    async def async_select_option(self, option: str) -> None:
+        assert self.coordinator.schedules
+        await self.coordinator.schedules.async_update(self.box_id, **{self._field: int(option)})

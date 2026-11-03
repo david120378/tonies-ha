@@ -152,3 +152,62 @@ async def test_active_sensor_via_mac(hass: HomeAssistant) -> None:
     assert active is not None, hass.states.async_entity_ids("binary_sensor")
     assert active.state == "on"
     assert active.attributes["tracker_entity"] == "device_tracker.toniebox_54ec"
+
+
+async def test_schedule(hass: HomeAssistant, freezer) -> None:
+    from datetime import timedelta
+    from pytest_homeassistant_custom_component.common import async_fire_time_changed
+    from homeassistant.util import dt as dt_util
+
+    await hass.config.async_set_time_zone("Europe/Berlin")
+    freezer.move_to("2026-11-03 18:00:00+01:00")
+    entry = MockConfigEntry(domain=DOMAIN, data={"username": "u", "password": "p"}, unique_id="uid6")
+    entry.add_to_hass(hass)
+    with patch("custom_components.tonies.ToniesClient") as cls:
+        client = cls.return_value
+        client.async_login = AsyncMock()
+        client.async_get_all_tonieboxes = AsyncMock(return_value={BOX["id"]: dict(BOX, maxVolume=50)})
+        client.async_get_tonies = AsyncMock(return_value=TONIES)
+
+        def _patch(hid, bid, **fields):
+            return dict(BOX, **fields)
+
+        client.async_patch_toniebox = AsyncMock(side_effect=_patch)
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+        prefix = "hauke_s_rote_toniebox"
+        assert hass.states.get(f"switch.{prefix}_volume_schedule").state == "off"
+        assert hass.states.get(f"time.{prefix}_night_from").state == "19:00:00"
+        assert hass.states.get(f"select.{prefix}_night_volume").state == "25"
+
+        # enabling at 18:00 (day) with box at 50 -> nothing to do
+        await hass.services.async_call(
+            "switch", "turn_on", {"entity_id": f"switch.{prefix}_volume_schedule"}, blocking=True
+        )
+        await hass.async_block_till_done()
+        client.async_patch_toniebox.assert_not_awaited()
+
+        # 19:00 -> night volume 25
+        freezer.move_to("2026-11-03 19:00:00+01:00")
+        async_fire_time_changed(hass, dt_util.utcnow())
+        await hass.async_block_till_done()
+        client.async_patch_toniebox.assert_awaited_once_with("H1", "4QN986SP", maxVolume=25)
+        assert hass.states.get(f"select.{prefix}_max_volume").state == "25"
+
+        # change day volume to 75 while it's night -> no immediate change
+        client.async_patch_toniebox.reset_mock()
+        await hass.services.async_call(
+            "select", "select_option", {"entity_id": f"select.{prefix}_day_volume", "option": "75"}, blocking=True
+        )
+        await hass.async_block_till_done()
+        client.async_patch_toniebox.assert_not_awaited()
+
+        # 07:00 next day -> 75
+        freezer.move_to("2026-11-04 07:00:00+01:00")
+        async_fire_time_changed(hass, dt_util.utcnow())
+        await hass.async_block_till_done()
+        client.async_patch_toniebox.assert_awaited_once_with("H1", "4QN986SP", maxVolume=75)
+
+        # storage persisted
+        assert hass.states.get(f"switch.{prefix}_volume_schedule").attributes["day_volume"] == 75

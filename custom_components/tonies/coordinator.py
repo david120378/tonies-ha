@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import timedelta
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -14,6 +14,9 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .api import ToniesApiError, ToniesAuthError, ToniesClient
 from .const import CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES, DOMAIN
+
+if TYPE_CHECKING:
+    from .schedule import ScheduleManager
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -43,6 +46,7 @@ class ToniesCoordinator(DataUpdateCoordinator[ToniesData]):
             config_entry=entry,
         )
         self.client = client
+        self.schedules: ScheduleManager | None = None
 
     async def _async_update_data(self) -> ToniesData:
         try:

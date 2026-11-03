@@ -61,11 +61,35 @@
           "left": "Next chapter: left",
           "right": "Next chapter: right"
         }
+      },
+      "night_volume": {
+        "name": "Night volume",
+        "state": {
+          "25": "25 %",
+          "50": "50 %",
+          "75": "75 %",
+          "100": "100 %"
+        }
+      },
+      "day_volume": {
+        "name": "Day volume",
+        "state": {
+          "25": "25 %",
+          "50": "50 %",
+          "75": "75 %",
+          "100": "100 %"
+        }
       }
     },
     "switch": {
       "accelerometer": {
         "name": "Tap & tilt"
+      },
+      "schedule": {
+        "name": "Volume schedule"
+      },
+      "schedule_headphones": {
+        "name": "Schedule also for headphones"
       }
     },
     "binary_sensor": {
@@ -102,6 +126,14 @@
     "button": {
       "refresh": {
         "name": "Refresh"
+      }
+    },
+    "time": {
+      "night_start": {
+        "name": "Night from"
+      },
+      "day_start": {
+        "name": "Day from"
       }
     }
   },

@@ -61,11 +61,35 @@
           "left": "Kapitel vor: links",
           "right": "Kapitel vor: rechts"
         }
+      },
+      "night_volume": {
+        "name": "Lautstärke nachts",
+        "state": {
+          "25": "25 %",
+          "50": "50 %",
+          "75": "75 %",
+          "100": "100 %"
+        }
+      },
+      "day_volume": {
+        "name": "Lautstärke tagsüber",
+        "state": {
+          "25": "25 %",
+          "50": "50 %",
+          "75": "75 %",
+          "100": "100 %"
+        }
       }
     },
     "switch": {
       "accelerometer": {
         "name": "Spulen und Klapsen"
+      },
+      "schedule": {
+        "name": "Zeitplan Lautstärke"
+      },
+      "schedule_headphones": {
+        "name": "Zeitplan auch für Kopfhörer"
       }
     },
     "binary_sensor": {
@@ -102,6 +126,14 @@
     "button": {
       "refresh": {
         "name": "Aktualisieren"
+      }
+    },
+    "time": {
+      "night_start": {
+        "name": "Nacht ab"
+      },
+      "day_start": {
+        "name": "Tag ab"
       }
     }
   },
