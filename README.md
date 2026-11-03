@@ -81,6 +81,12 @@ automation:
           option: "{{ '25' if trigger.id == 'nacht' else '50' }}"
 ```
 
+## Icon
+
+Das Integrations-Icon liegt in `custom_components/tonies/brand/` und wird von Home Assistant (ab der Version mit
+der „Brands“-Komponente, 2026) direkt von dort ausgeliefert – ein Eintrag im zentralen Brands-Repository ist nicht nötig.
+Eigenes Bild gewünscht? Einfach `icon.png` (256×256) und `icon@2x.png` (512×512) in diesem Ordner ersetzen und HA neu starten.
+
 ## Technik
 
 - Auth: Keycloak `login.tonies.com`, Realm `tonies`, Client `my-tonies`, Password-Grant + Refresh-Token
