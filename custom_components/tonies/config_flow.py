@@ -12,10 +12,22 @@ from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResu
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.selector import NumberSelector, NumberSelectorConfig, NumberSelectorMode
+from homeassistant.helpers.selector import (
+    EntitySelector,
+    EntitySelectorConfig,
+    NumberSelector,
+    NumberSelectorConfig,
+    NumberSelectorMode,
+)
 
 from .api import ToniesApiError, ToniesAuthError, ToniesClient
-from .const import CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES, DOMAIN, MIN_SCAN_INTERVAL_MINUTES
+from .const import (
+    CONF_SCAN_INTERVAL,
+    CONF_TRACKER_PREFIX,
+    DEFAULT_SCAN_INTERVAL_MINUTES,
+    DOMAIN,
+    MIN_SCAN_INTERVAL_MINUTES,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -89,20 +101,37 @@ class ToniesConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 class ToniesOptionsFlow(OptionsFlow):
-    """Options: polling interval."""
+    """Options: polling interval and one device_tracker per box (for the 'active' sensor)."""
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
-            return self.async_create_entry(data=user_input)
-        current = self.config_entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES)
-        schema = vol.Schema(
-            {
-                vol.Required(CONF_SCAN_INTERVAL, default=current): NumberSelector(
-                    NumberSelectorConfig(
-                        min=MIN_SCAN_INTERVAL_MINUTES, max=240, step=1, mode=NumberSelectorMode.BOX,
-                        unit_of_measurement="min",
-                    )
-                ),
-            }
+            # drop empty tracker selections so auto-detection by MAC applies again
+            data = {k: v for k, v in user_input.items() if not (k.startswith(CONF_TRACKER_PREFIX) and not v)}
+            return self.async_create_entry(data=data)
+
+        options = self.config_entry.options
+        fields: dict[Any, Any] = {
+            vol.Required(
+                CONF_SCAN_INTERVAL, default=options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL_MINUTES)
+            ): NumberSelector(
+                NumberSelectorConfig(
+                    min=MIN_SCAN_INTERVAL_MINUTES, max=240, step=1, mode=NumberSelectorMode.BOX,
+                    unit_of_measurement="min",
+                )
+            ),
+        }
+        boxes: dict[str, dict[str, Any]] = {}
+        if hasattr(self.config_entry, "runtime_data") and self.config_entry.runtime_data:
+            boxes = self.config_entry.runtime_data.data.boxes
+        placeholders = []
+        for box_id, box in boxes.items():
+            key = f"{CONF_TRACKER_PREFIX}{box_id}"
+            fields[vol.Optional(key, description={"suggested_value": options.get(key)})] = EntitySelector(
+                EntitySelectorConfig(domain="device_tracker")
+            )
+            placeholders.append(f"{box_id} = {box.get('name')} (MAC {box.get('macAddress')})")
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(fields),
+            description_placeholders={"boxes": "; ".join(placeholders) or "-"},
         )
-        return self.async_show_form(step_id="init", data_schema=schema)

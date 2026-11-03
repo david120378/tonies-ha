@@ -71,6 +71,9 @@
     "binary_sensor": {
       "settings_applied": {
         "name": "Settings applied"
+      },
+      "active": {
+        "name": "Active"
       }
     },
     "sensor": {
@@ -108,7 +111,8 @@
         "title": "Options",
         "data": {
           "scan_interval": "Polling interval (minutes)"
-        }
+        },
+        "description": "Trackers for the 'Active' sensor are found automatically via MAC address (e.g. FRITZ!Box). Only pick a device_tracker per box here if that fails. Boxes: {boxes}"
       }
     }
   }

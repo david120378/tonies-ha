@@ -17,6 +17,7 @@ Pro Toniebox im Haushalt wird ein Gerät mit diesen Entitäten angelegt:
 | Vor- und Zurücksteuern | select | Kapitelrichtung links/rechts |
 | Spulen und Klapsen | switch | Beschleunigungssensor |
 | Einstellungen übernommen | binary_sensor | `on`, sobald die Box die Einstellungen von der Cloud abgeholt hat |
+| Aktiv | binary_sensor | `on`, solange die Box wach ist (WLAN-Präsenz über einen `device_tracker`, z. B. FRITZ!Box); Attribut `last_active` |
 | Firmware, Online-Status, Haushalt | sensor | Diagnose |
 | Aktualisieren | button | Daten sofort neu laden |
 
@@ -30,6 +31,15 @@ Zusätzlich pro **Haushalt** ein Gerät mit:
 und pro **Kreativ-Tonie** ein Gerät mit *Freier Speicher* und *Belegter Speicher* (Minuten, Attribut `live`).
 
 Abfrageintervall: 15 Minuten (in den Integrations-Optionen einstellbar, min. 5); nach jeder Änderung sofort.
+
+### Sensor „Aktiv“ – was gerade läuft?
+
+Die Cloud weiß bei der klassischen Toniebox nicht, ob und was gerade gespielt wird. Die Box verbindet sich aber
+nur mit dem WLAN, solange sie wach ist. Die Integration sucht deshalb automatisch den `device_tracker` mit der
+MAC-Adresse der Box (FRITZ!Box-, UniFi-, Nmap-Integration o. ä.) und bildet daraus den Sensor **Aktiv**
+(`on` = Box ist wach / spielt vermutlich, `off` = schläft). Wird kein Tracker gefunden, kann er in den
+Integrations-Optionen je Box ausgewählt werden. Welcher Tonie aufliegt, ist damit nicht erkennbar – dafür
+braucht es [TeddyCloud](https://github.com/toniebox-reverse-engineering/teddycloud).
 
 ## Wichtig: Die Box muss synchronisieren
 

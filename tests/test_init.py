@@ -98,3 +98,57 @@ async def test_options_flow(hass: HomeAssistant) -> None:
         result = await hass.config_entries.options.async_configure(result["flow_id"], {"scan_interval": 30})
     assert result["type"] == "create_entry"
     assert entry.options["scan_interval"] == 30
+
+
+async def test_active_sensor_via_option(hass: HomeAssistant) -> None:
+    hass.states.async_set("device_tracker.toniebox", "not_home")
+    entry = MockConfigEntry(
+        domain=DOMAIN, data={"username": "u", "password": "p"}, unique_id="uid4",
+        options={"tracker_4QN986SP": "device_tracker.toniebox"},
+    )
+    entry.add_to_hass(hass)
+    with patch("custom_components.tonies.ToniesClient") as cls:
+        client = cls.return_value
+        client.async_login = AsyncMock()
+        client.async_get_all_tonieboxes = AsyncMock(return_value={BOX["id"]: dict(BOX)})
+        client.async_get_tonies = AsyncMock(return_value=TONIES)
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    active = hass.states.get("binary_sensor.hauke_s_rote_toniebox_active")
+    assert active is not None, hass.states.async_entity_ids("binary_sensor")
+    assert active.state == "off"
+    hass.states.async_set("device_tracker.toniebox", "home")
+    await hass.async_block_till_done()
+    active = hass.states.get("binary_sensor.hauke_s_rote_toniebox_active")
+    assert active.state == "on"
+    assert active.attributes["last_active"] is not None
+
+
+async def test_active_sensor_via_mac(hass: HomeAssistant) -> None:
+    from homeassistant.helpers import device_registry as dr, entity_registry as er
+
+    other = MockConfigEntry(domain="fritz", data={}, unique_id="fritz")
+    other.add_to_hass(hass)
+    dev = dr.async_get(hass).async_get_or_create(
+        config_entry_id=other.entry_id, connections={(dr.CONNECTION_NETWORK_MAC, "90:9a:77:15:54:ec")}
+    )
+    er.async_get(hass).async_get_or_create(
+        "device_tracker", "fritz", "909A771554EC", device_id=dev.id, suggested_object_id="toniebox_54ec"
+    )
+    hass.states.async_set("device_tracker.toniebox_54ec", "home")
+
+    entry = MockConfigEntry(domain=DOMAIN, data={"username": "u", "password": "p"}, unique_id="uid5")
+    entry.add_to_hass(hass)
+    with patch("custom_components.tonies.ToniesClient") as cls:
+        client = cls.return_value
+        client.async_login = AsyncMock()
+        client.async_get_all_tonieboxes = AsyncMock(return_value={BOX["id"]: dict(BOX)})
+        client.async_get_tonies = AsyncMock(return_value=TONIES)
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await hass.async_block_till_done()
+
+    active = hass.states.get("binary_sensor.hauke_s_rote_toniebox_active")
+    assert active is not None, hass.states.async_entity_ids("binary_sensor")
+    assert active.state == "on"
+    assert active.attributes["tracker_entity"] == "device_tracker.toniebox_54ec"

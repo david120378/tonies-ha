@@ -29,7 +29,7 @@ class ToniesBoxEntity(CoordinatorEntity[ToniesCoordinator]):
             model=f"Toniebox ({box.get('generation', 'unknown')})",
             serial_number=box_id,
             sw_version=str(box.get("firmwareVersion") or ""),
-            connections={("mac", _fmt_mac(box["macAddress"]))} if box.get("macAddress") else set(),
+            connections={("mac", format_mac(box["macAddress"]))} if box.get("macAddress") else set(),
         )
 
     @property
@@ -41,6 +41,6 @@ class ToniesBoxEntity(CoordinatorEntity[ToniesCoordinator]):
         return super().available and self.box_id in self.coordinator.data.boxes
 
 
-def _fmt_mac(raw: str) -> str:
+def format_mac(raw: str) -> str:
     raw = raw.replace(":", "").lower()
     return ":".join(raw[i : i + 2] for i in range(0, len(raw), 2))

@@ -13,3 +13,5 @@ MIN_SCAN_INTERVAL_MINUTES = 5
 VOLUME_OPTIONS = ["25", "50", "75", "100"]
 LED_OPTIONS = ["off", "dimmed", "on"]
 TAP_OPTIONS = ["left", "right"]
+
+CONF_TRACKER_PREFIX = "tracker_"
