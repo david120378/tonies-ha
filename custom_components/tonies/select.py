@@ -18,6 +18,7 @@ from .entity import ToniesBoxEntity
 class ToniesSelectDescription(SelectEntityDescription):
     api_field: str
     numeric: bool = False
+    show_picture: bool = False
 
 
 SELECTS: tuple[ToniesSelectDescription, ...] = (
@@ -27,6 +28,7 @@ SELECTS: tuple[ToniesSelectDescription, ...] = (
         options=VOLUME_OPTIONS,
         numeric=True,
         icon="mdi:volume-high",
+        show_picture=True,
     ),
     ToniesSelectDescription(
         key="max_headphone_volume",
@@ -67,6 +69,10 @@ class ToniesSelect(ToniesBoxEntity, SelectEntity):
     def __init__(self, coordinator: ToniesCoordinator, box_id: str, desc: ToniesSelectDescription) -> None:
         super().__init__(coordinator, box_id, desc.key)
         self.entity_description = desc
+
+    @property
+    def entity_picture(self) -> str | None:
+        return self.box_picture if self.entity_description.show_picture else None
 
     @property
     def current_option(self) -> str | None:

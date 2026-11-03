@@ -37,6 +37,11 @@ class ToniesBoxEntity(CoordinatorEntity[ToniesCoordinator]):
         return self.coordinator.data.boxes[self.box_id]
 
     @property
+    def box_picture(self) -> str | None:
+        """Product photo of this box from the cloud (matches the box colour)."""
+        return self.box.get("frontImageUrl") or self.box.get("imageUrl")
+
+    @property
     def available(self) -> bool:
         return super().available and self.box_id in self.coordinator.data.boxes
 

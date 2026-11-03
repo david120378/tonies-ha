@@ -178,6 +178,10 @@ class CreativeTonieEntity(CoordinatorEntity[ToniesCoordinator]):
     def available(self) -> bool:
         return super().available and self.tonie_id in self.coordinator.data.creative_tonies
 
+    @property
+    def entity_picture(self) -> str | None:
+        return self.tonie.get("imageUrl")
+
 
 class CreativeTonieRemainingSensor(CreativeTonieEntity, SensorEntity):
     _attr_icon = "mdi:timer-sand"

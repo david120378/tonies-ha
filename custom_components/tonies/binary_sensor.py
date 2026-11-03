@@ -72,6 +72,10 @@ class ToniesSettingsAppliedSensor(ToniesBoxEntity, BinarySensorEntity):
     def icon(self) -> str:
         return "mdi:sync" if self.is_on else "mdi:sync-alert"
 
+    @property
+    def entity_picture(self) -> str | None:
+        return self.box_picture
+
 
 class ToniesBoxActiveSensor(ToniesBoxEntity, BinarySensorEntity, RestoreEntity):
     """On while the box is awake (its WLAN device_tracker reports 'home')."""
@@ -112,6 +116,10 @@ class ToniesBoxActiveSensor(ToniesBoxEntity, BinarySensorEntity, RestoreEntity):
     @property
     def available(self) -> bool:
         return self._is_on is not None
+
+    @property
+    def entity_picture(self) -> str | None:
+        return self.box_picture
 
     @property
     def is_on(self) -> bool | None:
